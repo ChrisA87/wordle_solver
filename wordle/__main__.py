@@ -8,10 +8,11 @@ def get_corpus():
 
 
 def print_results(results, cols=3):
-    text = f'Found {len(results):,} possible results'
+    n_results = len(results)
+    text = f'Found {n_results:,} possible {"result" if n_results == 1 else "results"}'
     print(f'\n{"="*len(text)}\n{text}\n{"="*len(text)}')
-    for i in range(0, len(results), cols):
-        indices = [i + x for x in range(cols) if i + x < len(results)]
+    for i in range(0, n_results, cols):
+        indices = [i + x for x in range(cols) if i + x < n_results]
         print('    '.join([results[idx] for idx in indices]))
 
 
