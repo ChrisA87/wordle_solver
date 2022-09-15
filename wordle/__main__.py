@@ -7,6 +7,10 @@ def get_corpus():
     return {word.lower() for word in nltk.corpus.brown.words()}
 
 
+def filter_numeric(words):
+    return [word for word in words if not any(x.isdigit() for x in word)]
+
+
 def print_results(results, cols=3):
     n_results = len(results)
     text = f'Found {n_results:,} possible {"result" if n_results == 1 else "results"}'
@@ -16,7 +20,7 @@ def print_results(results, cols=3):
         print('    '.join([results[idx] for idx in indices]))
 
 
-def return_candidates(pattern='_____', exclude=None, include=None, corpus=get_corpus()):
+def return_candidates(pattern='_____', exclude=None, include=None, corpus=get_corpus(), include_numeric=False):
     if exclude is None:
         exclude = []
     if isinstance(exclude, str):
@@ -35,6 +39,10 @@ def return_candidates(pattern='_____', exclude=None, include=None, corpus=get_co
         if isinstance(include, str):
             include = list(include.lower())
         candidates = [word for word in candidates if all(x in word for x in include)]
+
+    if not include_numeric:
+        candidates = filter_numeric(candidates)
+
     return sorted(candidates)
 
 
@@ -62,12 +70,17 @@ def parse_args(argv):
                         default=5,
                         type=int)
 
+    parser.add_argument('--include-numeric',
+                        help='Includes words with numeric characters.',
+                        required=False,
+                        action='store_true')
+
     return parser.parse_args(argv)
 
 
 def main(argv):
     args = parse_args(argv)
-    results = return_candidates(args.pattern, exclude=args.exclude, include=args.include)
+    results = return_candidates(args.pattern, exclude=args.exclude, include=args.include, include_numeric=args.include_numeric)
     print_results(results, args.columns)
 
 
